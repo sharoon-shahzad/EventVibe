@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import InputComponent from "@/components/Atoms/Shared/Input";
 import Button from "@/components/Atoms/Buttons/Button";
-import Card from "@/components/Atoms/Card/Card";
 
 const Login = ({ H2, Card }) => {
   const [formData, setFormData] = useState({

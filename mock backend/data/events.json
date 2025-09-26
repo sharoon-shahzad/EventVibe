@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "title": "Event One",
+    "date": "2025-09-28",
+    "venue": "Auditorium",
+    "location": "City Center",
+    "category": "Music",
+    "posterUrl": "https://example.com/poster1.jpg",
+    "createdBy": 1,
+    "registeredUsers": [2]
+  }
+]
