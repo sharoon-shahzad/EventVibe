@@ -10,7 +10,6 @@ import {
 import ProtectedRoute from "./utils/routes/ProtectedRoute";
 import { H1 } from "./components/Atoms/Shared/headings";
 import Loader from "./components/Atoms/Loader/Loader";
-import AuthPage from "./Pages/Auth/AuthPage";
 
 export default function App() {
   const isAuthenticated = false; // Replace with real
@@ -18,7 +17,7 @@ export default function App() {
   const publicRedirectPath = LAYOUT_AUTH;
   const dashboardLinks = routes.filter((r) => r.layout === LAYOUT_DASHBOARD);
   const navLinks = routes.filter((r) => r.showInNavLinks);
-  const authLinks = routes.filter((r) => r.layout === publicRedirectPath);
+  const authLink = routes.filter((r) => r.layout === publicRedirectPath);
 
   return (
     <Routes>
@@ -67,7 +66,21 @@ export default function App() {
       </Route>
 
       {/* Auth */}
-      <Route path={LAYOUT_AUTH} element={<AuthPage />} />
+
+      {authLink?.map((route, index) => {
+        const Component = route.view;
+        return (
+          <Route
+            path={route.path}
+            element={
+              <Suspense fallback={<Loader />}>
+                <Component />
+              </Suspense>
+            }
+            key={index}
+          />
+        );
+      })}
 
       {/* Catch-all */}
       <Route path="*" element={<H1>Page not Found</H1>} />

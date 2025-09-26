@@ -2,7 +2,7 @@ import Button from "@/components/Atoms/Buttons/Button";
 import InputComponent from "@/components/Atoms/Shared/Input";
 import React, { useState } from "react";
 
-const Signin = () => {
+const Signin = ({ H2, Card }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -33,9 +33,8 @@ const Signin = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold text-center mb-6">Create Account</h2>
-
+    <Card>
+      <H2>Create Account</H2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <InputComponent
           type="text"
@@ -87,7 +86,7 @@ const Signin = () => {
           {isLoading ? "Creating Account..." : "Sign Up"}
         </Button>
       </form>
-    </div>
+    </Card>
   );
 };
 

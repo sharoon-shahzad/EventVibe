@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import InputComponent from "@/components/Atoms/Shared/Input";
 import Button from "@/components/Atoms/Buttons/Button";
+import Card from "@/components/Atoms/Card/Card";
 
-const Login = () => {
+const Login = ({ H2, Card }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,9 +27,8 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-
+    <Card heightAndWidth={"max-w-md"}>
+      <H2>Login</H2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <InputComponent
           type="email"
@@ -60,13 +60,7 @@ const Login = () => {
           {isLoading ? "Signing in..." : "Log In"}
         </Button>
       </form>
-
-      <div className="mt-4 text-center">
-        <a href="#" className="text-sm text-blue-600 hover:underline">
-          Forgot Password?
-        </a>
-      </div>
-    </div>
+    </Card>
   );
 };
 
