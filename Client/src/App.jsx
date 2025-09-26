@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard/Dashboard";
-import { allowedRoutes } from "./utils/routes/routes";
+import { getAllowedRoutes } from "./utils/routes/routes";
 import {
   LAYOUT_DASHBOARD,
   LAYOUT_AUTH,
@@ -10,14 +10,15 @@ import {
 import ProtectedRoute from "./utils/routes/ProtectedRoute";
 import { H1 } from "./components/Atoms/Shared/headings";
 import Loader from "./components/Atoms/Loader/Loader";
+import AuthPage from "./Pages/Auth/AuthPage";
 
 export default function App() {
-  const routes = allowedRoutes();
+  const isAuthenticated = false; // Replace with real
+  const routes = getAllowedRoutes("USER", isAuthenticated);
   const publicRedirectPath = LAYOUT_AUTH;
   const dashboardLinks = routes.filter((r) => r.layout === LAYOUT_DASHBOARD);
   const navLinks = routes.filter((r) => r.showInNavLinks);
   const authLinks = routes.filter((r) => r.layout === publicRedirectPath);
-  const isAuth = true; // Replace with real
 
   return (
     <Routes>
@@ -27,7 +28,9 @@ export default function App() {
         element={
           <Navigate
             to={
-              isAuth ? `${LAYOUT_DASHBOARD}/${urls.Home}` : publicRedirectPath
+              isAuthenticated
+                ? `${LAYOUT_DASHBOARD}/${urls.Home}`
+                : publicRedirectPath
             }
             replace
           />
@@ -36,12 +39,12 @@ export default function App() {
 
       {/* Dashboard (protected) */}
       <Route
-        path="/dashboard"
+        path={LAYOUT_DASHBOARD}
         element={
           <ProtectedRoute
             Navigate={Navigate}
             publicRedirectPath={publicRedirectPath}
-            isAuth={isAuth}
+            isAuthenticated={isAuthenticated}
           >
             <Dashboard navLinks={navLinks} />
           </ProtectedRoute>
@@ -64,22 +67,7 @@ export default function App() {
       </Route>
 
       {/* Auth */}
-      <Route path={LAYOUT_AUTH}>
-        {authLinks.map((r) => {
-          const Component = r.view;
-          return (
-            <Route
-              key={r.path}
-              path={r.path}
-              element={
-                <Suspense fallback={<Loader />}>
-                  <Component />
-                </Suspense>
-              }
-            />
-          );
-        })}
-      </Route>
+      <Route path={LAYOUT_AUTH} element={<AuthPage />} />
 
       {/* Catch-all */}
       <Route path="*" element={<H1>Page not Found</H1>} />
