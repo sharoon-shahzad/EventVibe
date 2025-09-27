@@ -12,5 +12,12 @@
     "email": "user@example.com",
     "password": "1234",
     "role": "user"
+  },
+  {
+    "id": 3,
+    "name": "Mehak Fatima Naqvi",
+    "email": "flamingo36672@mailshan.com",
+    "password": "test123",
+    "role": "user"
   }
 ]

@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import { getAllowedRoutes } from "./utils/routes/routes";
@@ -7,18 +7,19 @@ import {
   LAYOUT_AUTH,
   urls,
 } from "./utils/routes/route-paths";
-import ProtectedRoute from "./utils/routes/ProtectedRoute";
 import { H1 } from "./components/Atoms/Shared/headings";
 import Loader from "./components/Atoms/Loader/Loader";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "./store/slice/authSlice";
+const AuthPage = lazy(() => import("./Pages/Auth/AuthPage"));
 
 export default function App() {
-  const isAuthenticated = false; // Replace with real
+  const isAuthenticated = useSelector(selectIsAuthenticated) || false;
   const routes = getAllowedRoutes("USER", isAuthenticated);
   const publicRedirectPath = LAYOUT_AUTH;
   const dashboardLinks = routes.filter((r) => r.layout === LAYOUT_DASHBOARD);
   const navLinks = routes.filter((r) => r.showInNavLinks);
-  const authLink = routes.filter((r) => r.layout === publicRedirectPath);
-
+  console.log("isAuthenticated", isAuthenticated);
   return (
     <Routes>
       {/* Redirect root "/" */}
@@ -39,15 +40,7 @@ export default function App() {
       {/* Dashboard (protected) */}
       <Route
         path={LAYOUT_DASHBOARD}
-        element={
-          <ProtectedRoute
-            Navigate={Navigate}
-            publicRedirectPath={publicRedirectPath}
-            isAuthenticated={isAuthenticated}
-          >
-            <Dashboard navLinks={navLinks} />
-          </ProtectedRoute>
-        }
+        element={<Dashboard navLinks={navLinks} />}
       >
         {dashboardLinks.map((r) => {
           const Component = r.view;
@@ -67,21 +60,14 @@ export default function App() {
 
       {/* Auth */}
 
-      {authLink?.map((route, index) => {
-        const Component = route.view;
-        return (
-          <Route
-            path={route.path}
-            element={
-              <Suspense fallback={<Loader />}>
-                <Component />
-              </Suspense>
-            }
-            key={index}
-          />
-        );
-      })}
-
+      <Route
+        path={LAYOUT_AUTH}
+        element={
+          <Suspense fallback={<Loader />}>
+            <AuthPage />
+          </Suspense>
+        }
+      />
       {/* Catch-all */}
       <Route path="*" element={<H1>Page not Found</H1>} />
     </Routes>

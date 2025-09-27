@@ -19,6 +19,7 @@ let activeTokens = [];
 // --- Auth Routes ---
 app.post("/auth/login", async (req, res) => {
   await delay(300);
+  console.log("req", req.body);
   const { email, password } = req.body;
   const users = readData("users");
   const user = users.find((u) => u.email === email && u.password === password);

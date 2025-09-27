@@ -11,7 +11,7 @@ const AuthPage = () => {
     { tabName: "Sign in", component: <Signin H2={H2} Card={Card} /> },
   ];
   return (
-    <div className="w-full h-[100dvh] flex justify-center items-center">
+    <div className="w-full min-h-[100dvh] py-7 flex justify-center items-center">
       <Card heightAndWidth={"w-lg"}>
         <Tabs tabs={tabs} />
       </Card>
