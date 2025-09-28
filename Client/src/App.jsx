@@ -10,16 +10,21 @@ import {
 import { H1 } from "./components/Atoms/Shared/headings";
 import Loader from "./components/Atoms/Loader/Loader";
 import { useSelector } from "react-redux";
-import { selectIsAuthenticated } from "./store/slice/authSlice";
+import {
+  selectCurrentUser,
+  selectIsAuthenticated,
+} from "./store/slice/authSlice";
 const AuthPage = lazy(() => import("./Pages/Auth/AuthPage"));
 
 export default function App() {
+  const currentUser = useSelector(selectCurrentUser);
+  const userRole = currentUser?.role;
   const isAuthenticated = useSelector(selectIsAuthenticated) || false;
-  const routes = getAllowedRoutes("USER", isAuthenticated);
+  const routes = getAllowedRoutes(userRole, isAuthenticated);
   const publicRedirectPath = LAYOUT_AUTH;
   const dashboardLinks = routes.filter((r) => r.layout === LAYOUT_DASHBOARD);
   const navLinks = routes.filter((r) => r.showInNavLinks);
-  console.log("isAuthenticated", isAuthenticated);
+
   return (
     <Routes>
       {/* Redirect root "/" */}

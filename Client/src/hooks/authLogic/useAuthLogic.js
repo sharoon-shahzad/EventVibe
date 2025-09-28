@@ -28,6 +28,10 @@ export const useAuthLogic = () => {
     try {
       const res = await loginUser({ payload }).unwrap();
       dispatch(setCredentials({ user: res, token: res.token }));
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ user: res, token: res.token })
+      );
       navigate(`${LAYOUT_DASHBOARD}/${urls.Home}`);
       return res;
     } catch (err) {
@@ -39,6 +43,10 @@ export const useAuthLogic = () => {
     try {
       const res = await registerUser({ payload }).unwrap();
       dispatch(setCredentials({ user: res, token: res.token }));
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ user: res, token: res.token })
+      );
       navigate(`${LAYOUT_DASHBOARD}/${urls.Home}`);
       return res;
     } catch (err) {

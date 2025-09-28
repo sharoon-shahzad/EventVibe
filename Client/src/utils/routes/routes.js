@@ -2,9 +2,12 @@ import { lazy } from "react";
 import { getIcon } from "../helpers/iconsHelper";
 import { LAYOUT_AUTH, LAYOUT_DASHBOARD, urls } from "./route-paths";
 import { URL_Name } from "./url-names";
+import { UserRole } from "../enums/useRole";
 // components
 const Home = lazy(() => import("@/Pages/Home/Home"));
 const AuthPage = lazy(() => import("@/Pages/Auth/AuthPage"));
+const CreateEvent = lazy(() => import("@/Pages/Events/CreateEvent"));
+const EventDetail = lazy(() => import("@/Pages/Events/EventDetail"));
 
 export const allRoutes = [
   {
@@ -12,9 +15,23 @@ export const allRoutes = [
     name: URL_Name.home,
     view: Home,
     layout: LAYOUT_DASHBOARD,
-    icon: getIcon("home"),
+    // icon: getIcon("home"),
     showInNavLinks: true,
     showInTopHeader: false,
+  },
+  {
+    path: urls.CreateEvent,
+    name: URL_Name.createEvent,
+    view: CreateEvent,
+    layout: LAYOUT_DASHBOARD,
+    // showInNavLinks: true,
+    // showInTopHeader: false,
+  },
+  {
+    path: urls.EventDetail, //
+    name: URL_Name.eventDetail,
+    view: EventDetail,
+    layout: LAYOUT_DASHBOARD,
   },
   {
     path: urls.Auth,
@@ -28,8 +45,8 @@ export const allRoutes = [
 const authRoutes = allRoutes.filter((r) => r.layout === LAYOUT_AUTH);
 
 const roleBaseRoute = {
-  ["ADMIN"]: [urls.Home],
-  ["USER"]: [urls.Home],
+  [UserRole.admin]: [urls.Home, urls.CreateEvent, urls.EventDetail],
+  [UserRole.user]: [urls.Home, urls.EventDetail],
 };
 
 export const getAllowedRoutes = (userRole, isAuthenticated) => {

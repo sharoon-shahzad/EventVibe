@@ -10,6 +10,10 @@ import {
   FileTextIcon,
   ClipboardTextIcon,
   PlusIcon,
+  MagnifyingGlassIcon,
+  CalendarDotsIcon,
+  ClockIcon,
+  MapPinIcon,
 } from "@phosphor-icons/react";
 
 const iconList = {
@@ -24,6 +28,10 @@ const iconList = {
   grid: DiamondsFourIcon,
   sadEmoji: SmileySadIcon,
   broken: ImageBrokenIcon,
+  search: MagnifyingGlassIcon,
+  calendar: CalendarDotsIcon,
+  clock: ClockIcon,
+  location: MapPinIcon,
 };
 
 export const getIcon = (icon) => {
