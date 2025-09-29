@@ -1,5 +1,3 @@
-convert to md
-
 # Eventify - Modern Event Management Platform
 
 Built in 3 days with industry best practices
