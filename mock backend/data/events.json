@@ -2,15 +2,15 @@
   {
     "id": 1,
     "registeredUsers": [3],
-    "title": "test",
+    "title": "Frontend Developers Meetup",
     "date": "2025-03-03",
     "venue": "Tech Hub Downtown",
     "location": "Faisalabad",
     "category": "conference",
-    "description": "",
+    "description": "An interactive meetup for frontend engineers to share experiences, discuss React, Vue, and CSS best practices, and network with peers.",
     "time": "17:40",
     "capacity": 10,
-    "posterUrl": "blob:http://localhost:5173/efc3ec5d-b29d-4952-be2a-f03b96f88839",
+    "posterUrl": "https://www.dramabeans.com/wp-content/uploads/2020/11/SU_6.jpg",
     "createdBy": 1
   },
   {
@@ -25,6 +25,34 @@
     "time": "01:42",
     "capacity": 2,
     "posterUrl": "blob:http://localhost:5173/6236ed4e-0d6c-407b-846f-e41128875661",
+    "createdBy": 1
+  },
+  {
+    "id": 3,
+    "registeredUsers": [],
+    "title": "AI & Future Tech Summit",
+    "date": "2025-10-09",
+    "venue": "Innovation Center",
+    "location": "Karachi",
+    "category": "technology",
+    "description": "A one-day summit bringing together experts in AI, cloud, and emerging technologies to discuss trends and innovations shaping the future.",
+    "time": "19:30",
+    "capacity": 150,
+    "posterUrl": "blob:http://localhost:5173/41d7a353-fb19-4e09-89fb-c822bf98ac00",
+    "createdBy": 1
+  },
+  {
+    "id": 4,
+    "registeredUsers": [],
+    "title": "Startup Pitch Night",
+    "date": "2025-10-11",
+    "venue": "Sand Box",
+    "location": "Seoul",
+    "category": "business",
+    "description": "A platform for startups to present their business ideas to investors, gain feedback, and build valuable connections.",
+    "time": "12:00",
+    "capacity": 500,
+    "posterUrl": "blob:http://localhost:5173/4e93fc8b-d81a-472c-9d19-f80c332c22c2",
     "createdBy": 1
   }
 ]
