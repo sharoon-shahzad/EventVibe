@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { selectCurrentUser, clearAuth } from "@/store/slice/authSlice";
 import { setSearchTerm } from "@/store/slice/eventSlice";
@@ -11,7 +11,7 @@ import {
   urls,
 } from "@/utils/routes/route-paths";
 import Button from "@/components/Atoms/Buttons/Button";
-import MobileSidebar from "./MobileSidebar";
+import SideBar from "./SideBar";
 import { getIcon } from "@/utils/helpers/iconsHelper";
 
 const TopNavBar = () => {
@@ -23,6 +23,18 @@ const TopNavBar = () => {
   const navigate = useNavigate();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // handle body scroll when sidebar is open
+  useEffect(() => {
+    if (isMobileSidebarOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isMobileSidebarOpen]);
 
   // icons
   const PlusIcon = getIcon("plus");
@@ -39,7 +51,7 @@ const TopNavBar = () => {
   return (
     <nav className="w-full fixed top-0 left-0 z-50 bg-white shadow-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-        {/* Left: Logo (desktop only) */}
+        {/* Logo (desktop only) */}
         <div
           className="hidden lg:flex text-xl font-bold items-center gap-2 text-indigo-600 cursor-pointer"
           onClick={() => navigate("/")}
@@ -48,24 +60,14 @@ const TopNavBar = () => {
           <span>Eventify</span>
         </div>
 
-        {/* Mobile User Avatar */}
+        {/* Mobile Menu Button */}
         <div className="lg:hidden">
-          {currentUser ? (
-            <button
-              className="w-9 h-9 rounded-full bg-indigo-200 flex items-center justify-center font-semibold text-indigo-700"
-              onClick={() => setIsMobileSidebarOpen(true)}
-            >
-              {currentUser?.name?.charAt(0).toUpperCase()}
-            </button>
-          ) : (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate(`${LAYOUT_AUTH}`)}
-            >
-              Login
-            </Button>
-          )}
+          <button
+            className="w-9 h-9 rounded-full bg-indigo-200 flex items-center justify-center font-semibold text-indigo-700"
+            onClick={() => setIsMobileSidebarOpen(true)}
+          >
+            {currentUser?.name?.charAt(0)?.toUpperCase() || "U"}
+          </button>
         </div>
 
         {/* Search Bar */}
@@ -75,8 +77,8 @@ const TopNavBar = () => {
             type="text"
             placeholder="Search events..."
             className="w-full border-gray-300"
-            value={currentSearchTerm} // Get value from Redux
-            onChange={(e) => dispatch(setSearchTerm(e.target.value))} // Update Redux
+            value={currentSearchTerm}
+            onChange={(e) => dispatch(setSearchTerm(e.target.value))}
           />
         </div>
 
@@ -119,16 +121,7 @@ const TopNavBar = () => {
                         My Events
                       </li>
                     )}
-                    <li
-                      onClick={() => {
-                        navigate("/my-registrations");
-                        setDropdownOpen(false);
-                      }}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-                    >
-                      <UserIcon size={16} />
-                      My Registrations
-                    </li>
+
                     <hr className="my-1" />
                     <li
                       onClick={() => {
@@ -160,11 +153,33 @@ const TopNavBar = () => {
         )}
       </div>
 
-      {/* Mobile Sidebar */}
-      <MobileSidebar
-        isOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
-      />
+      {/* Desktop Sidebar as Mobile Overlay with Slide Animation */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop with reduced opacity */}
+          <div
+            className="absolute inset-0 bg-[#00000094] transition-opacity duration-300 ease-in-out"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+
+          {/* Sidebar with slide animation */}
+          <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl z-10 transform transition-transform duration-300 ease-in-out translate-x-0">
+            <div className="h-full flex flex-col">
+              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <SideBar />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

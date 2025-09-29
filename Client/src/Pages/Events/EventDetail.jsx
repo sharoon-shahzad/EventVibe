@@ -94,7 +94,7 @@ const EventDetail = () => {
     day: "numeric",
   });
 
-  // Icon data for event information
+  // Icon data
   const eventInfoItems = [
     { icon: "calendar", label: "Date", value: formattedDate },
     { icon: "clock", label: "Time", value: event.time || "TBD" },
@@ -115,7 +115,7 @@ const EventDetail = () => {
     { label: "Category", value: event.category || "General" },
   ];
 
-  // Render event information items
+  //  event information items
   const renderEventInfo = () => (
     <div className="space-y-3 text-gray-700">
       {eventInfoItems.map((item, index) => (
@@ -136,7 +136,7 @@ const EventDetail = () => {
     </div>
   );
 
-  // Render additional info items
+  //  additional info items
   const renderAdditionalInfo = () => (
     <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
       {additionalInfoItems.map((item, index) => (
@@ -148,7 +148,7 @@ const EventDetail = () => {
     </div>
   );
 
-  // Render registration section for non-admin users
+  //  registration section for non-admin users
   const renderRegistrationSection = () => (
     <div className="space-y-3 text-gray-700">
       <div className="bg-gray-50 p-4 rounded-lg">

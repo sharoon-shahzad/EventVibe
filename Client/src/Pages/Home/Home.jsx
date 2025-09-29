@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setSelectedCategory,
@@ -7,7 +7,7 @@ import {
 } from "@/store/slice/eventSlice";
 import { useEventLogic } from "@/hooks/events/useEventLogic";
 import LoadingOverlay from "@/components/Atoms/Loader/LoadingOverlay";
-import { H1, H2, H3, SubHeading } from "@/components/Atoms/Shared/headings";
+import { H1, H2 } from "@/components/Atoms/Shared/headings";
 import EventCard from "@/components/Molecules/events/EventCard";
 import SelectComponent from "@/components/Atoms/SelectComponent/SelectComponent";
 import Card from "@/components/Atoms/Card/Card";
@@ -26,70 +26,79 @@ const Home = () => {
     eventsError,
     isUserRegistered,
     handleRegisterForEvent,
-    isRegistering: globalIsRegistering,
   } = useEventLogic();
 
   const [registeringEventId, setRegisteringEventId] = useState(null);
 
   const CalendarDotsIcon = getIcon("calendar");
 
-  const categories = useMemo(() => {
-    if (!allEvents) return [];
-    const uniqueCategories = [
-      ...new Set(allEvents.map((event) => event.category)),
-    ];
-    return uniqueCategories.filter((cat) => cat && cat.trim() !== "");
-  }, [allEvents]);
+  const categories = allEvents
+    ? [...new Set(allEvents.map((event) => event.category))].filter(
+        (cat) => cat && cat.trim() !== ""
+      )
+    : [];
 
-  const locations = useMemo(() => {
-    if (!allEvents) return [];
-    const uniqueLocations = [
-      ...new Set(allEvents.map((event) => event.location)),
-    ];
-    return uniqueLocations.filter((loc) => loc && loc.trim() !== "");
-  }, [allEvents]);
+  const locations = allEvents
+    ? [...new Set(allEvents.map((event) => event.location))].filter(
+        (loc) => loc && loc.trim() !== ""
+      )
+    : [];
 
-  // Filter for upcoming events by default
-  const upcomingEvents = useMemo(() => {
-    if (!events) return [];
+  const upcomingEvents = events
+    ? events.filter((event) => {
+        try {
+          let eventDate;
+          if (event.date) {
+            eventDate = new Date(event.date);
+          } else {
+            return false;
+          }
 
-    const today = new Date();
-    return events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return eventDate >= today;
-    });
-  }, [events]);
+          if (isNaN(eventDate.getTime())) {
+            return false;
+          }
 
-  const filteredEvents = useMemo(() => {
-    if (!upcomingEvents) return [];
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate >= today;
+        } catch (error) {
+          return false;
+        }
+      })
+    : [];
 
-    return upcomingEvents.filter((event) => {
-      const matchesCategory =
-        !selectedCategory || event.category === selectedCategory;
-      const matchesLocation =
-        !selectedLocation || event.location === selectedLocation;
-      return matchesCategory && matchesLocation;
-    });
-  }, [upcomingEvents, selectedCategory, selectedLocation]);
+  const filteredEvents = upcomingEvents.filter((event) => {
+    const matchesCategory =
+      !selectedCategory || event.category === selectedCategory;
+    const matchesLocation =
+      !selectedLocation || event.location === selectedLocation;
+    return matchesCategory && matchesLocation;
+  });
 
-  const sortedEvents = useMemo(() => {
-    if (!filteredEvents) return [];
-
-    return [...filteredEvents].sort((a, b) => {
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    try {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
+
+      if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+        return 0;
+      }
+
       return dateA - dateB;
-    });
-  }, [filteredEvents]);
+    } catch (error) {
+      return 0;
+    }
+  });
 
   const handleRegisterForEventWithTracking = async (eventId) => {
     setRegisteringEventId(eventId);
     try {
       await handleRegisterForEvent(eventId);
+    } catch (error) {
+      console.error("Registration failed:", error);
     } finally {
-      if (registeringEventId === eventId) {
-        setRegisteringEventId(null);
-      }
+      setRegisteringEventId(null);
     }
   };
 
@@ -100,7 +109,6 @@ const Home = () => {
   if (isEventsLoading) {
     return (
       <div className="flex min-h-screen">
-        {/* Main Content */}
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-t-blue-500 border-l-blue-500 border-b-blue-500 border-r-white"></div>
         </div>
@@ -111,7 +119,6 @@ const Home = () => {
   if (eventsError) {
     return (
       <div className="flex min-h-screen">
-        {/* Main Content */}
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-red-500 text-center">
             <H2>Error Loading Events</H2>
@@ -124,21 +131,19 @@ const Home = () => {
 
   return (
     <Card>
-      {/* Main Content */}
       <div className="min-h-screen">
         <div className="p-6 max-w-7xl mx-auto">
-          {/* Header with Filters */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <div>
                 <H1>Upcoming Events</H1>
                 <p className="text-gray-600 mt-1">
-                  {sortedEvents.length} upcoming event
-                  {sortedEvents.length !== 1 ? "s" : ""} available
+                  Showing {sortedEvents.length} upcoming event
+                  {sortedEvents.length !== 1 ? "s" : ""} of{" "}
+                  {allEvents?.length || 0} total
                 </p>
               </div>
 
-              {/* Filters */}
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                 <div className="flex-1 min-w-0">
                   <SelectComponent
@@ -196,7 +201,7 @@ const Home = () => {
                     event={event}
                     isRegistered={isUserRegistered(event)}
                     onRegister={handleRegisterForEventWithTracking}
-                    isRegistering={registeringEventId === event.id} // Pass individual event loading state
+                    isRegistering={registeringEventId === event.id}
                   />
                 ))}
               </div>
@@ -212,6 +217,9 @@ const Home = () => {
                   {selectedCategory || selectedLocation
                     ? "No upcoming events match your selected filters. Try clearing the filters."
                     : "Check back later for new events!"}
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Total events loaded: {allEvents?.length || 0}
                 </p>
                 {(selectedCategory || selectedLocation) && (
                   <Button onClick={clearFiltersHandler} variant="ghost">

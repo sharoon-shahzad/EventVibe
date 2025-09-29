@@ -1,107 +1,32 @@
 [
   {
     "id": 1,
-    "title": "Event One",
-    "date": "2025-09-28",
-    "venue": "Auditorium",
-    "location": "City Center",
-    "category": "Music",
-    "posterUrl": "https://example.com/poster1.jpg",
-    "createdBy": 1,
     "registeredUsers": [
       3
     ],
-    "description": "An unforgettable night of live jazz and soul music under the stars.",
-    "time": "7:00 PM",
-    "capacity": 200
-  },
-  {
-    "id": 2,
-    "title": "Tech Conference 2025",
-    "date": "2025-10-15",
-    "venue": "Convention Hall",
-    "location": "Downtown Tech District",
-    "category": "Technology",
-    "posterUrl": "",
-    "createdBy": 3,
-    "registeredUsers": [],
-    "description": "Join industry leaders to discuss AI, blockchain, and the future of tech.",
-    "time": "9:00 AM - 5:00 PM",
-    "capacity": 500
-  },
-  {
-    "id": 3,
-    "title": "Art & Wine Night",
-    "date": "2025-11-05",
-    "venue": "Gallery Space",
-    "location": "Arts District",
-    "category": "Art",
-    "posterUrl": "https://example.com/poster3.jpg",
-    "createdBy": 2,
-    "registeredUsers": [
-      3
-    ],
-    "description": "Sip fine wine while exploring local artists’ latest collections.",
-    "time": "6:30 PM",
-    "capacity": 80
-  },
-  {
-    "id": 4,
-    "title": "Startup Pitch Day",
-    "date": "2025-10-22",
-    "venue": "Innovation Hub",
-    "location": "Silicon Alley",
-    "category": "Business",
-    "posterUrl": null,
-    "createdBy": 5,
-    "registeredUsers": [
-      3
-    ],
-    "description": "Watch emerging startups pitch their ideas to top investors.",
-    "time": "2:00 PM",
-    "capacity": 150
-  },
-  {
-    "id": 5,
-    "title": "Yoga in the Park",
-    "date": "2025-09-30",
-    "venue": "Riverside Park",
-    "location": "North End",
-    "category": "Wellness",
-    "posterUrl": "https://example.com/poster5.jpg",
-    "createdBy": 4,
-    "registeredUsers": [
-      3
-    ],
-    "description": "Start your morning with guided yoga and meditation in nature.",
-    "time": "8:00 AM",
-    "capacity": 100
-  },
-  {
-    "id": 6,
-    "registeredUsers": [
-      3
-    ],
-    "title": "React Developer Meetup",
-    "date": "2025-09-30",
-    "venue": "Tech Hub Downtown",
-    "category": "conference",
-    "description": "Join fellow React developers for networking, talks, and workshops. We'll cover the latest React features, best practices, and have hands-on coding sessions. Food and drinks will be provided.",
-    "poster": null,
-    "createdBy": 1
-  },
-  {
-    "id": 7,
-    "registeredUsers": [],
-    "title": "Test Title",
-    "date": "2025-09-03",
+    "title": "test",
+    "date": "2025-10-03",
     "venue": "Tech Hub Downtown",
     "location": "Faisalabad",
     "category": "conference",
     "description": "",
-    "time": "17:36",
-    "capacity": 22,
-    "posterUrl": "blob:http://localhost:5173/220c055c-b015-4659-b902-72541d1f0680",
+    "time": "17:40",
+    "capacity": 10,
+    "posterUrl": "blob:http://localhost:5173/efc3ec5d-b29d-4952-be2a-f03b96f88839",
+    "createdBy": 1
+  },
+  {
+    "id": 2,
+    "registeredUsers": [],
+    "title": "title",
+    "date": "2025-09-03",
+    "venue": "Tech Hub Downtown",
+    "location": "tehran",
+    "category": "conference",
+    "description": "",
+    "time": "01:42",
+    "capacity": 2,
+    "posterUrl": "blob:http://localhost:5173/6236ed4e-0d6c-407b-846f-e41128875661",
     "createdBy": 1
   }
 ]

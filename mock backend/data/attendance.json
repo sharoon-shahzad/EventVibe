@@ -28,5 +28,11 @@
     "eventId": 4,
     "userId": 3,
     "status": "registered"
+  },
+  {
+    "id": 6,
+    "eventId": 1,
+    "userId": 3,
+    "status": "registered"
   }
 ]
