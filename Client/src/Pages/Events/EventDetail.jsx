@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/store/slice/authSlice";
 import { UserRole } from "@/utils/enums/useRole";
 import FallbackImage from "@/components/Atoms/Shared/FallbackImage";
+import FeedbackSection from "./FeedbackSection";
 
 const EventDetail = () => {
   const { id } = useParams();
@@ -21,6 +22,9 @@ const EventDetail = () => {
     handleRegisterForEvent,
     isRegistering,
     isUserRegistered,
+    handleSubmitFeedback,
+    isSubmittingFeedback,
+    feedback,
   } = useEventLogic();
   const {
     handleMarkAttendeePresent,
@@ -28,7 +32,6 @@ const EventDetail = () => {
     isMarkingAttendeePresent,
   } = useAttendanceLogic();
 
-  // Use the single event query
   const {
     data: event,
     isLoading: isEventLoading,
@@ -40,7 +43,6 @@ const EventDetail = () => {
   const handleRegister = () => handleRegisterForEvent(parseInt(id));
   const handleBack = () => navigate(-1);
 
-  // Check if event has passed
   const isEventPassed = event && new Date(event.date) < new Date();
 
   const handleMarkAttendance = async (attendeeId) => {
@@ -86,7 +88,6 @@ const EventDetail = () => {
     );
   }
 
-  // Format date
   const formattedDate = new Date(event.date).toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -94,7 +95,6 @@ const EventDetail = () => {
     day: "numeric",
   });
 
-  // Icon data
   const eventInfoItems = [
     { icon: "calendar", label: "Date", value: formattedDate },
     { icon: "clock", label: "Time", value: event.time || "TBD" },
@@ -106,7 +106,6 @@ const EventDetail = () => {
     { icon: "user", label: "Venue", value: event.venue || "Not specified" },
   ];
 
-  // Additional info items
   const additionalInfoItems = [
     {
       label: "Registered Users",
@@ -115,7 +114,6 @@ const EventDetail = () => {
     { label: "Category", value: event.category || "General" },
   ];
 
-  //  event information items
   const renderEventInfo = () => (
     <div className="space-y-3 text-gray-700">
       {eventInfoItems.map((item, index) => (
@@ -136,7 +134,6 @@ const EventDetail = () => {
     </div>
   );
 
-  //  additional info items
   const renderAdditionalInfo = () => (
     <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
       {additionalInfoItems.map((item, index) => (
@@ -148,7 +145,6 @@ const EventDetail = () => {
     </div>
   );
 
-  //  registration section for non-admin users
   const renderRegistrationSection = () => (
     <div className="space-y-3 text-gray-700">
       <div className="bg-gray-50 p-4 rounded-lg">
@@ -189,7 +185,6 @@ const EventDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-6">
-        {/* Back Button */}
         <div className="mb-6">
           <Button
             onClick={handleBack}
@@ -202,7 +197,6 @@ const EventDetail = () => {
 
         <Card>
           <div className="space-y-6 p-2">
-            {/* Event Image */}
             <div className="w-full h-64 md:h-80 bg-gray-100 rounded-lg overflow-hidden relative">
               <FallbackImage
                 src={event.posterUrl}
@@ -212,7 +206,6 @@ const EventDetail = () => {
               />
             </div>
 
-            {/* Event Title */}
             <div>
               <H1 className="!mb-2">{event.title}</H1>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -232,7 +225,6 @@ const EventDetail = () => {
               </div>
             </div>
 
-            {/* Event Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <H3>Event Information</H3>
@@ -261,7 +253,6 @@ const EventDetail = () => {
               </div>
             </div>
 
-            {/* Admin Attendance Section for Passed Events */}
             {currentUser?.role === UserRole.admin && isEventPassed && (
               <AttendanceTabs
                 attendees={event.attendees}
@@ -273,7 +264,6 @@ const EventDetail = () => {
               />
             )}
 
-            {/* Event Description */}
             <div>
               <H3>Description</H3>
               <div className="prose max-w-none">
@@ -283,10 +273,18 @@ const EventDetail = () => {
               </div>
             </div>
 
-            {/* Additional Info */}
             <div className="border-t border-gray-200 pt-6">
               {renderAdditionalInfo()}
             </div>
+
+            <FeedbackSection
+              event={event}
+              currentUser={currentUser}
+              feedback={feedback}
+              handleSubmitFeedback={handleSubmitFeedback}
+              isSubmittingFeedback={isSubmittingFeedback}
+              id={id}
+            />
           </div>
         </Card>
       </div>

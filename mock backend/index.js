@@ -74,16 +74,29 @@ app.get("/events/:id", async (req, res) => {
   // Attach attendee info
   const attendance = readData("attendance");
   const users = readData("users");
+  const feedbacks = readData("feedback");
 
   const attendees = attendance
     .filter((a) => a.eventId == event.id)
     .map((a) => ({
       id: a.id,
+      userId: a.userId,
       status: a.status,
       user: users.find((u) => u.id == a.userId),
     }));
 
-  res.json({ ...event, attendees });
+  const eventFeedback = feedbacks
+    .filter((f) => f.eventId == event.id)
+    .map((f) => ({
+      ...f,
+      userName: users.find((u) => u.id == f.userId)?.name || "Unknown User",
+    }));
+
+  res.json({
+    ...event,
+    attendees,
+    feedback: eventFeedback,
+  });
 });
 
 app.post("/events", async (req, res) => {

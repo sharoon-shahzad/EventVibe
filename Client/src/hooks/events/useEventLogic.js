@@ -6,7 +6,6 @@ import {
   useGetEventByIdQuery,
   useCreateEventMutation,
   useRegisterForEventMutation,
-  useGetEventFeedbackQuery,
   useSubmitEventFeedbackMutation,
 } from "@/store/api/events/eventApiSlice";
 import { setSearchTerm } from "@/store/slice/eventSlice";
@@ -22,8 +21,6 @@ export const useEventLogic = () => {
     isLoading: isEventsLoading,
     error: eventsError,
   } = useGetEventsQuery();
-
-  const { feedback, isLoading: isFeedbackLoading } = useGetEventFeedbackQuery();
 
   // Mutations
   const [createEvent, { isLoading: isCreatingEvent, error: createEventError }] =
@@ -137,14 +134,12 @@ export const useEventLogic = () => {
     // Data
     events: searchedEvents, // Return searched events
     allEvents: events, // Original events for filters
-    feedback,
 
     // Loading states
     isEventsLoading,
     isCreatingEvent,
     isRegistering,
     isSubmittingFeedback,
-    isFeedbackLoading,
 
     // Errors
     eventsError,

@@ -36,20 +36,7 @@ const eventApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: { userId },
       }),
-      invalidatesTags: (result, error, { eventId }) => [
-        { type: "Event", id: eventId },
-        "Events",
-      ],
-    }),
-
-    // Get feedback for an event
-    getEventFeedback: builder.query({
-      query: (eventId) => ({
-        url: `${api_routes.events}/${eventId}/feedback`,
-      }),
-      providesTags: (result, error, eventId) => [
-        { type: "Feedback", id: eventId },
-      ],
+      invalidatesTags: (result, error, id) => [{ type: "Event", eventId }],
     }),
 
     // Submit feedback for an event
@@ -71,7 +58,6 @@ export const {
   useGetEventByIdQuery,
   useCreateEventMutation,
   useRegisterForEventMutation,
-  useGetEventFeedbackQuery,
   useSubmitEventFeedbackMutation,
 } = eventApiSlice;
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Tabs from "@/components/Atoms/Shared/Tabs";
 import AttendeeItem from "./AttendeeItem";
+import Button from "@/components/Atoms/Buttons/Button";
 
 const AttendanceTabs = ({
   attendees,
@@ -10,7 +11,6 @@ const AttendanceTabs = ({
   selectedAttendees,
   setSelectedAttendees,
 }) => {
-  // Filter attendees by status
   const presentAttendees =
     attendees?.filter((attendee) => attendee.status === "present") || [];
   const absentAttendees =
@@ -68,8 +68,8 @@ const AttendanceTabs = ({
                   onSelect={handleSelectAttendee}
                   onMarkAttendance={onMarkAttendance}
                   isMarkingAttendeePresent={isMarkingAttendeePresent}
-                  showCheckbox={false} // Don't show checkbox for present users
-                  showMarkButton={false} // Don't show mark button for present users
+                  showCheckbox={false}
+                  showMarkButton={false}
                 />
               ))}
             </div>
