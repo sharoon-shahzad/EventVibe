@@ -14,7 +14,7 @@ Production-ready architecture with real-time capabilities
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript
+- **Frontend**: React 18 + JavaScript
 - **State Management**: RTK Query (with real-time invalidation)
 - **Styling**: TailwindCSS + Phosphor Icons
 - **Architecture**: Atomic Design (Atoms, Molecules, Organisms)
@@ -71,7 +71,7 @@ Make an env in client and place the url where Backend is running
 ** Backend **
 
 ```bash
-cd client
+cd mock backend
 npm install
 node start // or nodemon start (if installed)
 ```
