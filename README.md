@@ -86,15 +86,14 @@ _Home page with search and event listings_
 ![Event Creation](screenshots/create-event.png)
 _Event creation form with image upload_
 
-![Event Details](screenshots/event-details.png)
-_Event details with registration_
-
 ![Admin Profile](screenshots/admin-dashboard.png)
+_Profile Page with event listing_
+
 ![Attendee Management](screenshots/attendeeManagement.png)
 _Admin panel with attendee management_
 
 ![Mobile View](screenshots/mobile.png)
-_Fully responsive mobile interface_
+_Fully responsive mobile interface, Event details with registration_
 
 ## Architecture Highlights
 
