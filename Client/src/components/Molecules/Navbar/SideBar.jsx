@@ -5,8 +5,13 @@ import { selectCurrentUser } from "@/store/slice/authSlice";
 import { useEventLogic } from "@/hooks/events/useEventLogic";
 import { useAttendanceLogic } from "@/hooks/attendance/useAttendanceLogic";
 import { getIcon } from "@/utils/helpers/iconsHelper";
-import { LAYOUT_DASHBOARD, urls } from "@/utils/routes/route-paths";
+import {
+  LAYOUT_AUTH,
+  LAYOUT_DASHBOARD,
+  urls,
+} from "@/utils/routes/route-paths";
 import { UserRole } from "@/utils/enums/useRole";
+import { SignOutIcon } from "@phosphor-icons/react";
 
 const SideBar = () => {
   const currentUser = useSelector(selectCurrentUser);
@@ -14,18 +19,22 @@ const SideBar = () => {
   const { eventAttendees } = useAttendanceLogic();
   const isAdmin = currentUser?.role === UserRole.admin;
 
-  // Get icons
+  //  icons
   const HomeIcon = getIcon("home");
   const CalendarIcon = getIcon("calendar");
   const UsersIcon = getIcon("profile");
   const PlusIcon = getIcon("plus");
-  // Fallback if no user data
-  const firstName = currentUser?.name?.split(" ")[0] || "User";
 
-  // Calculate real-time stats based on role
+  const firstName = currentUser?.name?.split(" ")[0] || "User";
+  // logout
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    localStorage.removeItem("auth");
+    navigate(LAYOUT_AUTH);
+  };
+  //  real-time stats based on role
   const getStats = () => {
     if (isAdmin) {
-      // Admin stats
       const adminEvents =
         events?.filter((event) => event.createdBy === currentUser.id) || [];
       const totalAttendees = adminEvents.reduce(
@@ -40,7 +49,6 @@ const SideBar = () => {
         secondLabel: "Attendees",
       };
     } else {
-      // User stats
       const userRegisteredEvents =
         events?.filter((event) =>
           event.registeredUsers?.includes(currentUser.id)
@@ -143,9 +151,16 @@ const SideBar = () => {
 
       {/* Sidebar Footer */}
       <div className="p-4 border-t border-gray-200 flex-shrink-0">
-        <button className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
-          Settings
-        </button>
+        <li
+          onClick={() => {
+            handleLogout();
+            setDropdownOpen(false);
+          }}
+          className="px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+        >
+          <SignOutIcon size={16} />
+          Logout
+        </li>
       </div>
     </div>
   );
