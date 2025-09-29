@@ -38,7 +38,9 @@
     "category": "Art",
     "posterUrl": "https://example.com/poster3.jpg",
     "createdBy": 2,
-    "registeredUsers": [],
+    "registeredUsers": [
+      3
+    ],
     "description": "Sip fine wine while exploring local artists’ latest collections.",
     "time": "6:30 PM",
     "capacity": 80
@@ -52,7 +54,9 @@
     "category": "Business",
     "posterUrl": null,
     "createdBy": 5,
-    "registeredUsers": [],
+    "registeredUsers": [
+      3
+    ],
     "description": "Watch emerging startups pitch their ideas to top investors.",
     "time": "2:00 PM",
     "capacity": 150
@@ -66,14 +70,18 @@
     "category": "Wellness",
     "posterUrl": "https://example.com/poster5.jpg",
     "createdBy": 4,
-    "registeredUsers": [],
+    "registeredUsers": [
+      3
+    ],
     "description": "Start your morning with guided yoga and meditation in nature.",
     "time": "8:00 AM",
     "capacity": 100
   },
   {
     "id": 6,
-    "registeredUsers": [],
+    "registeredUsers": [
+      3
+    ],
     "title": "React Developer Meetup",
     "date": "2025-09-30",
     "venue": "Tech Hub Downtown",

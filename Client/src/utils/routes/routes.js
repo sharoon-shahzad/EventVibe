@@ -8,6 +8,8 @@ const Home = lazy(() => import("@/Pages/Home/Home"));
 const AuthPage = lazy(() => import("@/Pages/Auth/AuthPage"));
 const CreateEvent = lazy(() => import("@/Pages/Events/CreateEvent"));
 const EventDetail = lazy(() => import("@/Pages/Events/EventDetail"));
+const Profile = lazy(() => import("@/Pages/Profile/Profile"));
+const MyEvents = lazy(() => import("@/Pages/MyEvents/MyEvents"));
 
 export const allRoutes = [
   {
@@ -15,7 +17,6 @@ export const allRoutes = [
     name: URL_Name.home,
     view: Home,
     layout: LAYOUT_DASHBOARD,
-    // icon: getIcon("home"),
     showInNavLinks: true,
     showInTopHeader: false,
   },
@@ -24,11 +25,9 @@ export const allRoutes = [
     name: URL_Name.createEvent,
     view: CreateEvent,
     layout: LAYOUT_DASHBOARD,
-    // showInNavLinks: true,
-    // showInTopHeader: false,
   },
   {
-    path: urls.EventDetail, //
+    path: urls.EventDetail,
     name: URL_Name.eventDetail,
     view: EventDetail,
     layout: LAYOUT_DASHBOARD,
@@ -40,13 +39,31 @@ export const allRoutes = [
     layout: LAYOUT_AUTH,
     icon: null,
   },
+  {
+    path: urls.Profile,
+    name: URL_Name.profile,
+    view: Profile,
+    layout: LAYOUT_DASHBOARD,
+  },
+  {
+    path: urls.MyEvents,
+    name: URL_Name.myEvents,
+    view: MyEvents,
+    layout: LAYOUT_DASHBOARD,
+  },
 ];
 
 const authRoutes = allRoutes.filter((r) => r.layout === LAYOUT_AUTH);
 
 const roleBaseRoute = {
-  [UserRole.admin]: [urls.Home, urls.CreateEvent, urls.EventDetail],
-  [UserRole.user]: [urls.Home, urls.EventDetail],
+  [UserRole.admin]: [
+    urls.Home,
+    urls.CreateEvent,
+    urls.EventDetail,
+    urls.Profile,
+    urls.MyEvents,
+  ],
+  [UserRole.user]: [urls.Home, urls.EventDetail, urls.Profile, urls.MyEvents],
 };
 
 export const getAllowedRoutes = (userRole, isAuthenticated) => {

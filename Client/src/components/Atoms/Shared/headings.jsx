@@ -2,7 +2,7 @@ import React from "react";
 
 const H1 = ({ children, className = "", ...props }) => (
   <h1
-    className={`text-3xl lg:text-5xl font-bold mb-3 lg:mb-6 ${className}`}
+    className={`text-3xl lg:text-5xl text-gray-900 font-bold mb-3 lg:mb-6 ${className}`}
     {...props}
   >
     {children}
@@ -11,7 +11,7 @@ const H1 = ({ children, className = "", ...props }) => (
 
 const H2 = ({ children, className = "", ...props }) => (
   <h2
-    className={`text-2xl lg:text-4xl font-bold mb-2 lg:mb-5 ${className}`}
+    className={`text-2xl lg:text-4xl text-gray-900 font-bold mb-2 lg:mb-5 ${className}`}
     {...props}
   >
     {children}
@@ -20,7 +20,7 @@ const H2 = ({ children, className = "", ...props }) => (
 
 const H3 = ({ children, className = "", ...props }) => (
   <h3
-    className={`text-xl lg:text-3xl font-semibold mb-1 lg:mb-4 ${className}`}
+    className={`text-xl lg:text-3xl text-gray-900 font-semibold mb-1 lg:mb-4 ${className}`}
     {...props}
   >
     {children}
@@ -29,7 +29,7 @@ const H3 = ({ children, className = "", ...props }) => (
 
 const H4 = ({ children, className = "", ...props }) => (
   <h4
-    className={`text-lg lg:text-2xl font-semibold mb-1 lg:mb-3 ${className}`}
+    className={`text-lg lg:text-2xl text-gray-900 font-semibold mb-1 lg:mb-3 ${className}`}
     {...props}
   >
     {children}

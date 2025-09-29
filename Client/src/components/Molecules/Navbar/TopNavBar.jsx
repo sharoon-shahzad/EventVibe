@@ -99,7 +99,7 @@ const TopNavBar = () => {
                   <ul className="text-sm text-gray-700">
                     <li
                       onClick={() => {
-                        navigate("/profile");
+                        navigate(`${LAYOUT_DASHBOARD}/${urls.Profile}`);
                         setDropdownOpen(false);
                       }}
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
@@ -107,22 +107,26 @@ const TopNavBar = () => {
                       <UserIcon size={16} />
                       View Profile
                     </li>
-                    <li
-                      onClick={() => {
-                        navigate("/my-events");
-                        setDropdownOpen(false);
-                      }}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    >
-                      My Events
-                    </li>
+                    {useRole === "admin" && (
+                      <li
+                        onClick={() => {
+                          navigate("/my-events");
+                          setDropdownOpen(false);
+                        }}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+                      >
+                        <CalendarDotsIcon size={16} />
+                        My Events
+                      </li>
+                    )}
                     <li
                       onClick={() => {
                         navigate("/my-registrations");
                         setDropdownOpen(false);
                       }}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
                     >
+                      <UserIcon size={16} />
                       My Registrations
                     </li>
                     <hr className="my-1" />

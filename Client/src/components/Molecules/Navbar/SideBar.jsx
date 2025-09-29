@@ -1,16 +1,68 @@
-// src/components/Molecules/SideBar/SideBar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/store/slice/authSlice";
+import { useEventLogic } from "@/hooks/events/useEventLogic";
+import { useAttendanceLogic } from "@/hooks/attendance/useAttendanceLogic";
+import { getIcon } from "@/utils/helpers/iconsHelper";
+import { LAYOUT_DASHBOARD, urls } from "@/utils/routes/route-paths";
+import { UserRole } from "@/utils/enums/useRole";
 
 const SideBar = () => {
   const currentUser = useSelector(selectCurrentUser);
+  const { events } = useEventLogic();
+  const { eventAttendees } = useAttendanceLogic();
+  const isAdmin = currentUser?.role === UserRole.admin;
 
+  // Get icons
+  const HomeIcon = getIcon("home");
+  const CalendarIcon = getIcon("calendar");
+  const UsersIcon = getIcon("profile");
+  const PlusIcon = getIcon("plus");
   // Fallback if no user data
   const firstName = currentUser?.name?.split(" ")[0] || "User";
-  const registeredEvents = 3; // Placeholder
-  const attendedEvents = 2; // Placeholder
+
+  // Calculate real-time stats based on role
+  const getStats = () => {
+    if (isAdmin) {
+      // Admin stats
+      const adminEvents =
+        events?.filter((event) => event.createdBy === currentUser.id) || [];
+      const totalAttendees = adminEvents.reduce(
+        (total, event) => total + (event.registeredUsers?.length || 0),
+        0
+      );
+
+      return {
+        firstStat: adminEvents.length,
+        firstLabel: "Events",
+        secondStat: totalAttendees,
+        secondLabel: "Attendees",
+      };
+    } else {
+      // User stats
+      const userRegisteredEvents =
+        events?.filter((event) =>
+          event.registeredUsers?.includes(currentUser.id)
+        ) || [];
+
+      const userAttendedEvents =
+        eventAttendees?.filter(
+          (attendee) =>
+            attendee.userId === currentUser.id &&
+            (attendee.isPresent || attendee.attended)
+        ) || [];
+
+      return {
+        firstStat: userRegisteredEvents.length,
+        firstLabel: "Registered",
+        secondStat: userAttendedEvents.length,
+        secondLabel: "Attended",
+      };
+    }
+  };
+
+  const { firstStat, firstLabel, secondStat, secondLabel } = getStats();
 
   return (
     <div className="h-full flex flex-col bg-white border-r border-gray-200 shadow-sm overflow-hidden">
@@ -27,25 +79,25 @@ const SideBar = () => {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Real-time Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-blue-50 p-3 rounded-lg">
             <span className="block text-sm font-semibold text-blue-700">
-              {registeredEvents}
+              {firstStat}
             </span>
-            <span className="text-xs text-blue-600">Registered</span>
+            <span className="text-xs text-blue-600">{firstLabel}</span>
           </div>
           <div className="bg-green-50 p-3 rounded-lg">
             <span className="block text-sm font-semibold text-green-700">
-              {attendedEvents}
+              {secondStat}
             </span>
-            <span className="text-xs text-green-600">Attended</span>
+            <span className="text-xs text-green-600">{secondLabel}</span>
           </div>
         </div>
 
         {/* View Profile Button */}
         <Link
-          to="/profile"
+          to={`${LAYOUT_DASHBOARD}/${urls.Profile}`}
           className="block w-full text-center py-2 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors border border-gray-300"
         >
           View Profile
@@ -60,70 +112,32 @@ const SideBar = () => {
               to="/"
               className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
             >
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"
-                />
-              </svg>
+              <HomeIcon weight="fill" className="w-5 h-5 text-gray-500" />
               All Events
             </Link>
           </li>
+
           <li>
             <Link
-              to="/my-events"
+              to={`${LAYOUT_DASHBOARD}/${urls.MyEvents}`}
               className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
+              <CalendarIcon weight="fill" className="w-5 h-5 text-gray-500" />
               My Events
             </Link>
           </li>
-          <li>
-            <Link
-              to="/create-event"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+
+          {currentUser?.role === UserRole.admin && (
+            <li>
+              <Link
+                to={`${LAYOUT_DASHBOARD}/${urls.CreateEvent}`}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Create Event
-            </Link>
-          </li>
+                <PlusIcon weight="fill" className="w-5 h-5 text-gray-500" />
+                Create Event
+              </Link>
+            </li>
+          )}
         </ul>
       </nav>
 

@@ -19,7 +19,6 @@ let activeTokens = [];
 // --- Auth Routes ---
 app.post("/auth/login", async (req, res) => {
   await delay(300);
-  console.log("req", req.body);
   const { email, password } = req.body;
   const users = readData("users");
   const user = users.find((u) => u.email === email && u.password === password);
@@ -68,11 +67,23 @@ app.get("/events", async (req, res) => {
 });
 
 app.get("/events/:id", async (req, res) => {
-  await delay(200);
   const events = readData("events");
   const event = events.find((e) => e.id == req.params.id);
   if (!event) return res.status(404).json({ message: "Event not found" });
-  res.json(event);
+
+  // Attach attendee info
+  const attendance = readData("attendance");
+  const users = readData("users");
+
+  const attendees = attendance
+    .filter((a) => a.eventId == event.id)
+    .map((a) => ({
+      id: a.id,
+      status: a.status,
+      user: users.find((u) => u.id == a.userId),
+    }));
+
+  res.json({ ...event, attendees });
 });
 
 app.post("/events", async (req, res) => {
@@ -85,16 +96,76 @@ app.post("/events", async (req, res) => {
   res.json(newEvent);
 });
 
+// --- Event Registration + Attendance ---
 app.post("/events/:id/register", async (req, res) => {
   await delay(200);
   const { userId } = req.body;
   const events = readData("events");
   const event = events.find((e) => e.id == req.params.id);
   if (!event) return res.status(404).json({ message: "Event not found" });
+
+  // Attendance file
+  const attendance = readData("attendance");
+
+  // Check if already registered
+  const existing = attendance.find(
+    (a) => a.eventId == event.id && a.userId == userId
+  );
+  if (!existing) {
+    const newRecord = {
+      id: attendance.length + 1,
+      eventId: event.id,
+      userId,
+      status: "registered",
+    };
+    attendance.push(newRecord);
+    writeData("attendance", attendance);
+  }
+
   if (!event.registeredUsers.includes(userId))
     event.registeredUsers.push(userId);
+
   writeData("events", events);
   res.json({ eventId: event.id, userId });
+});
+
+// --- Get attendees (admin) ---
+app.get("/events/:id/attendees", async (req, res) => {
+  await delay(200);
+  const attendance = readData("attendance");
+  const users = readData("users");
+  const eventAttendees = attendance
+    .filter((a) => a.eventId == req.params.id)
+    .map((a) => ({
+      ...a,
+      user: users.find((u) => u.id == a.userId),
+    }));
+  res.json(eventAttendees);
+});
+
+// --- Mark present (admin) ---
+app.put("/attendance/:id/present", async (req, res) => {
+  await delay(200);
+  const attendance = readData("attendance");
+  const record = attendance.find((a) => a.id == req.params.id);
+  if (!record) return res.status(404).json({ message: "Record not found" });
+  record.status = "present";
+  writeData("attendance", attendance);
+  res.json(record);
+});
+
+// --- User registered events ---
+app.get("/users/:id/events", async (req, res) => {
+  await delay(200);
+  const attendance = readData("attendance");
+  const events = readData("events");
+  const userEvents = attendance
+    .filter((a) => a.userId == req.params.id)
+    .map((a) => ({
+      ...a,
+      event: events.find((e) => e.id == a.eventId),
+    }));
+  res.json(userEvents);
 });
 
 // --- Feedback ---
@@ -117,3 +188,48 @@ app.get("/events/:id/feedback", async (req, res) => {
 app.listen(PORT, () =>
   console.log(`Mock backend running at http://localhost:${PORT}`)
 );
+
+// Get event details with registered users (admin)
+app.get("/admin/events/:id/attendees", async (req, res) => {
+  await delay(200);
+  const events = readData("events");
+  const attendance = readData("attendance");
+  const users = readData("users");
+
+  const event = events.find((e) => e.id == req.params.id);
+  if (!event) return res.status(404).json({ message: "Event not found" });
+
+  // Map attendance for this event
+  const attendees = attendance
+    .filter((a) => a.eventId == event.id)
+    .map((a) => ({
+      id: a.id,
+      status: a.status,
+      user: users.find((u) => u.id == a.userId),
+    }));
+
+  res.json({ ...event, attendees });
+});
+
+// Mark multiple attendees as present
+app.put("/attendance/present", async (req, res) => {
+  await delay(200);
+  const { attendanceIds } = req.body;
+  if (!Array.isArray(attendanceIds) || attendanceIds.length === 0) {
+    return res.status(400).json({ message: "attendanceIds array required" });
+  }
+
+  const attendance = readData("attendance");
+  const updatedRecords = [];
+
+  attendanceIds.forEach((id) => {
+    const record = attendance.find((a) => a.id == id);
+    if (record) {
+      record.status = "present";
+      updatedRecords.push(record);
+    }
+  });
+
+  writeData("attendance", attendance);
+  res.json({ updatedRecords });
+});

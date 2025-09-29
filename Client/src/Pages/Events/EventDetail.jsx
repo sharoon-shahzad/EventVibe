@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEventLogic } from "@/hooks/events/useEventLogic";
+import { useAttendanceLogic } from "@/hooks/attendance/useAttendanceLogic";
 import Card from "@/components/Atoms/Card/Card";
 import Button from "@/components/Atoms/Buttons/Button";
 import { H1, H2, H3, SubHeading } from "@/components/Atoms/Shared/headings";
-import { getIcon } from "@/utils/helpers/iconsHelper";
+import IconContainer from "@/components/Atoms/Shared/IconContainer";
+import AttendanceTabs from "@/components/Molecules/Attendance/AttendanceTabs";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/store/slice/authSlice";
 import { UserRole } from "@/utils/enums/useRole";
@@ -13,19 +15,18 @@ import FallbackImage from "@/components/Atoms/Shared/FallbackImage";
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const currentUser = useSelector(selectCurrentUser);
   const {
     useGetSingleEvent,
     handleRegisterForEvent,
     isRegistering,
     isUserRegistered,
   } = useEventLogic();
-  const currentUser = useSelector(selectCurrentUser);
-
-  // Icons
-  const CalendarIcon = getIcon("calendar");
-  const ClockIcon = getIcon("clock");
-  const LocationIcon = getIcon("location");
-  const UserIcon = getIcon("user");
+  const {
+    handleMarkAttendeePresent,
+    handleMarkMultipleAttendeesPresent,
+    isMarkingAttendeePresent,
+  } = useAttendanceLogic();
 
   // Use the single event query
   const {
@@ -34,8 +35,30 @@ const EventDetail = () => {
     error: eventError,
   } = useGetSingleEvent(id);
 
+  const [selectedAttendees, setSelectedAttendees] = useState([]);
+
   const handleRegister = () => handleRegisterForEvent(parseInt(id));
   const handleBack = () => navigate(-1);
+
+  // Check if event has passed
+  const isEventPassed = event && new Date(event.date) < new Date();
+
+  const handleMarkAttendance = async (attendeeId) => {
+    try {
+      await handleMarkAttendeePresent(attendeeId);
+    } catch (error) {
+      console.error("Failed to mark attendance:", error);
+    }
+  };
+
+  const handleMarkMultipleAttendance = async (attendeeIds) => {
+    try {
+      await handleMarkMultipleAttendeesPresent(attendeeIds);
+      setSelectedAttendees([]);
+    } catch (error) {
+      console.error("Failed to mark multiple attendance:", error);
+    }
+  };
 
   if (isEventLoading) {
     return (
@@ -71,42 +94,101 @@ const EventDetail = () => {
     day: "numeric",
   });
 
-  // Event information items
+  // Icon data for event information
   const eventInfoItems = [
+    { icon: "calendar", label: "Date", value: formattedDate },
+    { icon: "clock", label: "Time", value: event.time || "TBD" },
     {
-      icon: CalendarIcon,
-      label: "Date",
-      value: formattedDate,
-    },
-    {
-      icon: ClockIcon,
-      label: "Time",
-      value: event.time || "TBD",
-    },
-    {
-      icon: LocationIcon,
+      icon: "location",
       label: "Location",
       value: event.location || "Not specified",
     },
-    {
-      icon: UserIcon,
-      label: "Venue",
-      value: event.venue || "Not specified",
-    },
+    { icon: "user", label: "Venue", value: event.venue || "Not specified" },
   ];
 
   // Additional info items
   const additionalInfoItems = [
-    { label: "Created By", value: `User ID: ${event.createdBy}` },
     {
       label: "Registered Users",
       value: `${event.registeredUsers?.length || 0} people`,
     },
+    { label: "Category", value: event.category || "General" },
   ];
+
+  // Render event information items
+  const renderEventInfo = () => (
+    <div className="space-y-3 text-gray-700">
+      {eventInfoItems.map((item, index) => (
+        <div key={index} className="flex items-start gap-3">
+          <IconContainer
+            icon={item.icon}
+            size={12}
+            className="text-blue-600"
+            containerSize="w-6 h-6"
+            containerClassName="bg-blue-100 rounded-full flex-shrink-0 mt-0.5"
+          />
+          <div>
+            <SubHeading>{item.label}</SubHeading>
+            <p className="text-gray-600">{item.value}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Render additional info items
+  const renderAdditionalInfo = () => (
+    <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+      {additionalInfoItems.map((item, index) => (
+        <div key={index}>
+          <SubHeading>{item.label}</SubHeading>
+          <p>{item.value}</p>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Render registration section for non-admin users
+  const renderRegistrationSection = () => (
+    <div className="space-y-3 text-gray-700">
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <SubHeading>Capacity</SubHeading>
+        <p className="text-gray-600">
+          {event.capacity
+            ? `${event.capacity} total spots`
+            : "Unlimited capacity"}
+        </p>
+        <p className="text-sm text-gray-500 mt-1">
+          {event.registeredUsers?.length || 0} registered
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <Button
+          variant={isUserRegistered(event) ? "secondary" : "primary"}
+          disabled={isUserRegistered(event) || isRegistering}
+          onClick={handleRegister}
+          className="w-full"
+        >
+          {isUserRegistered(event)
+            ? "Registered"
+            : isRegistering
+            ? "Registering..."
+            : "Register Now"}
+        </Button>
+
+        <p className="text-xs text-gray-500 text-center">
+          {isUserRegistered(event)
+            ? "You're registered for this event"
+            : "Register to secure your spot"}
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-6">
         {/* Back Button */}
         <div className="mb-6">
           <Button
@@ -142,6 +224,11 @@ const EventDetail = () => {
                     ? `${event.capacity} spots`
                     : "Unlimited capacity"}
                 </span>
+                {isEventPassed && (
+                  <span className="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full font-medium">
+                    Passed
+                  </span>
+                )}
               </div>
             </div>
 
@@ -149,63 +236,42 @@ const EventDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <H3>Event Information</H3>
-                <div className="space-y-3 text-gray-700">
-                  {eventInfoItems.map((item, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <item.icon size={12} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <SubHeading>{item.label}</SubHeading>
-                        <p className="text-gray-600">{item.value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {renderEventInfo()}
               </div>
 
               <div className="space-y-4">
                 <H3>Registration</H3>
-                <div className="space-y-3 text-gray-700">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <SubHeading>Capacity</SubHeading>
-                    <p className="text-gray-600">
-                      {event.capacity
-                        ? `${event.capacity} total spots`
-                        : "Unlimited capacity"}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {event.registeredUsers?.length || 0} registered
-                    </p>
-                  </div>
-
-                  {currentUser?.role !== UserRole.admin && (
-                    <div className="space-y-3">
-                      <Button
-                        variant={
-                          isUserRegistered(event) ? "secondary" : "primary"
-                        }
-                        disabled={isUserRegistered(event) || isRegistering}
-                        onClick={handleRegister}
-                        className="w-full"
-                      >
-                        {isUserRegistered(event)
-                          ? "Registered"
-                          : isRegistering
-                          ? "Registering..."
-                          : "Register Now"}
-                      </Button>
-
-                      <p className="text-xs text-gray-500 text-center">
-                        {isUserRegistered(event)
-                          ? "You're registered for this event"
-                          : "Register to secure your spot"}
+                {currentUser?.role !== UserRole.admin ? (
+                  renderRegistrationSection()
+                ) : (
+                  <div className="space-y-3 text-gray-700">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <SubHeading>Capacity</SubHeading>
+                      <p className="text-gray-600">
+                        {event.capacity
+                          ? `${event.capacity} total spots`
+                          : "Unlimited capacity"}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {event.registeredUsers?.length || 0} registered
                       </p>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Admin Attendance Section for Passed Events */}
+            {currentUser?.role === UserRole.admin && isEventPassed && (
+              <AttendanceTabs
+                attendees={event.attendees}
+                onMarkAttendance={handleMarkAttendance}
+                onMarkMultipleAttendance={handleMarkMultipleAttendance}
+                isMarkingAttendeePresent={isMarkingAttendeePresent}
+                selectedAttendees={selectedAttendees}
+                setSelectedAttendees={setSelectedAttendees}
+              />
+            )}
 
             {/* Event Description */}
             <div>
@@ -219,14 +285,7 @@ const EventDetail = () => {
 
             {/* Additional Info */}
             <div className="border-t border-gray-200 pt-6">
-              <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                {additionalInfoItems.map((item, index) => (
-                  <div key={index}>
-                    <SubHeading>{item.label}</SubHeading>
-                    <p>{item.value}</p>
-                  </div>
-                ))}
-              </div>
+              {renderAdditionalInfo()}
             </div>
           </div>
         </Card>

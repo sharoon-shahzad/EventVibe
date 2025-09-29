@@ -4,11 +4,13 @@ const Card = ({
   children,
   heightAndWidth,
   rounded = "rounded-2xl",
+  className = "",
   ...props
 }) => {
   return (
     <div
-      className={`
+      className={` 
+        ${className}
         h-auto 
         p-3 sm:p-4 lg:p-6 
         px-4 sm:px-6 lg:px-10 

@@ -1,11 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setSelectedCategory,
   setSelectedLocation,
   clearFilters,
 } from "@/store/slice/eventSlice";
-import SideBar from "@/components/Molecules/Navbar/SideBar";
 import { useEventLogic } from "@/hooks/events/useEventLogic";
 import LoadingOverlay from "@/components/Atoms/Loader/LoadingOverlay";
 import { H1, H2, H3, SubHeading } from "@/components/Atoms/Shared/headings";
@@ -13,6 +12,7 @@ import EventCard from "@/components/Molecules/events/EventCard";
 import SelectComponent from "@/components/Atoms/SelectComponent/SelectComponent";
 import Card from "@/components/Atoms/Card/Card";
 import { getIcon } from "@/utils/helpers/iconsHelper";
+import Button from "@/components/Atoms/Buttons/Button";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -20,18 +20,19 @@ const Home = () => {
   const selectedLocation = useSelector((state) => state.event.selectedLocation);
 
   const {
-    events, //  searched events
-    allEvents, // Original events for filters
+    events,
+    allEvents,
     isEventsLoading,
     eventsError,
     isUserRegistered,
     handleRegisterForEvent,
-    isRegistering,
+    isRegistering: globalIsRegistering,
   } = useEventLogic();
+
+  const [registeringEventId, setRegisteringEventId] = useState(null);
 
   const CalendarDotsIcon = getIcon("calendar");
 
-  // Extract unique categories and locations from allEvents (original)
   const categories = useMemo(() => {
     if (!allEvents) return [];
     const uniqueCategories = [
@@ -48,18 +49,28 @@ const Home = () => {
     return uniqueLocations.filter((loc) => loc && loc.trim() !== "");
   }, [allEvents]);
 
-  // Filter events based on selected filters (this will filter the searched events)
-  const filteredEvents = useMemo(() => {
+  // Filter for upcoming events by default
+  const upcomingEvents = useMemo(() => {
     if (!events) return [];
 
+    const today = new Date();
     return events.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate >= today;
+    });
+  }, [events]);
+
+  const filteredEvents = useMemo(() => {
+    if (!upcomingEvents) return [];
+
+    return upcomingEvents.filter((event) => {
       const matchesCategory =
         !selectedCategory || event.category === selectedCategory;
       const matchesLocation =
         !selectedLocation || event.location === selectedLocation;
       return matchesCategory && matchesLocation;
     });
-  }, [events, selectedCategory, selectedLocation]);
+  }, [upcomingEvents, selectedCategory, selectedLocation]);
 
   const sortedEvents = useMemo(() => {
     if (!filteredEvents) return [];
@@ -67,9 +78,20 @@ const Home = () => {
     return [...filteredEvents].sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      return dateB - dateA;
+      return dateA - dateB;
     });
   }, [filteredEvents]);
+
+  const handleRegisterForEventWithTracking = async (eventId) => {
+    setRegisteringEventId(eventId);
+    try {
+      await handleRegisterForEvent(eventId);
+    } finally {
+      if (registeringEventId === eventId) {
+        setRegisteringEventId(null);
+      }
+    }
+  };
 
   const clearFiltersHandler = () => {
     dispatch(clearFilters());
@@ -78,13 +100,8 @@ const Home = () => {
   if (isEventsLoading) {
     return (
       <div className="flex min-h-screen">
-        {/* Fixed Sidebar */}
-        <div className="w-72 hidden lg:block fixed h-screen bg-gray-50 border-r border-gray-200 z-10 overflow-hidden">
-          <SideBar />
-        </div>
-
         {/* Main Content */}
-        <div className="lg:ml-72 flex-1 flex items-center justify-center p-8">
+        <div className="flex-1 flex items-center justify-center p-8">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-t-blue-500 border-l-blue-500 border-b-blue-500 border-r-white"></div>
         </div>
       </div>
@@ -94,13 +111,8 @@ const Home = () => {
   if (eventsError) {
     return (
       <div className="flex min-h-screen">
-        {/* Fixed Sidebar */}
-        <div className="w-72 hidden lg:block fixed h-screen bg-gray-50 border-r border-gray-200 z-10 overflow-hidden">
-          <SideBar />
-        </div>
-
         {/* Main Content */}
-        <div className="lg:ml-72 flex-1 flex items-center justify-center p-8">
+        <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-red-500 text-center">
             <H2>Error Loading Events</H2>
             <p className="mt-2">{eventsError.message}</p>
@@ -111,22 +123,17 @@ const Home = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Fixed Sidebar */}
-      <div className="w-72 hidden lg:block fixed h-screen bg-white border-r border-gray-200 z-10 shadow-sm overflow-hidden">
-        <SideBar />
-      </div>
-
+    <Card>
       {/* Main Content */}
-      <div className="lg:ml-72 flex-1 min-h-screen">
+      <div className="min-h-screen">
         <div className="p-6 max-w-7xl mx-auto">
           {/* Header with Filters */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <div>
-                <H1 className="text-3xl font-bold text-gray-900">Events</H1>
+                <H1>Upcoming Events</H1>
                 <p className="text-gray-600 mt-1">
-                  {sortedEvents.length} event
+                  {sortedEvents.length} upcoming event
                   {sortedEvents.length !== 1 ? "s" : ""} available
                 </p>
               </div>
@@ -168,12 +175,13 @@ const Home = () => {
                 </div>
 
                 {(selectedCategory || selectedLocation) && (
-                  <button
+                  <Button
                     onClick={clearFiltersHandler}
-                    className="self-end px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors border border-gray-300"
+                    variant="ghost"
+                    size="sm"
                   >
                     Clear Filters
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -187,8 +195,8 @@ const Home = () => {
                     key={event.id}
                     event={event}
                     isRegistered={isUserRegistered(event)}
-                    onRegister={handleRegisterForEvent}
-                    isRegistering={isRegistering}
+                    onRegister={handleRegisterForEventWithTracking}
+                    isRegistering={registeringEventId === event.id} // Pass individual event loading state
                   />
                 ))}
               </div>
@@ -198,27 +206,24 @@ const Home = () => {
                   <CalendarDotsIcon weight="fill" />
                 </div>
                 <H2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  No events found
+                  No upcoming events found
                 </H2>
                 <p className="text-gray-600 mb-6">
                   {selectedCategory || selectedLocation
-                    ? "No events match your selected filters. Try clearing the filters."
+                    ? "No upcoming events match your selected filters. Try clearing the filters."
                     : "Check back later for new events!"}
                 </p>
                 {(selectedCategory || selectedLocation) && (
-                  <button
-                    onClick={clearFiltersHandler}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                  >
+                  <Button onClick={clearFiltersHandler} variant="ghost">
                     Clear Filters
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
           </LoadingOverlay>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

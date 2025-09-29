@@ -32,7 +32,7 @@ const eventApiSlice = apiSlice.injectEndpoints({
     // Register user for event
     registerForEvent: builder.mutation({
       query: ({ eventId, userId }) => ({
-        url: `${api_routes.events}/${eventId}/register`,
+        url: `${api_routes.userEvents(eventId)}`,
         method: "POST",
         body: { userId },
       }),

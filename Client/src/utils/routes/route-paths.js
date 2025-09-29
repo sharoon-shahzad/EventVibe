@@ -6,4 +6,6 @@ export const urls = {
   Auth: "auth",
   CreateEvent: "create-event",
   EventDetail: "event/:id",
+  Profile: "profile",
+  MyEvents: "my-events",
 };
